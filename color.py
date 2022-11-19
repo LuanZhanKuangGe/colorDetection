@@ -14,19 +14,19 @@ def getShape(contour):
 
     # putting shape name at center of each shape
     if len(approx) == 3:
-        return 'Triangle'
+        return 'Triangle', x, y
 
     elif len(approx) == 4:
-        return 'Quadrilateral'
+        return 'Quadrilateral', x, y
 
     elif len(approx) == 5:
-        return 'Pentagon'
+        return 'Pentagon', x, y
 
     elif len(approx) == 6:
-        return 'Hexagon'
+        return 'Hexagon', x, y
 
     else:
-        return 'circle'
+        return 'circle', x, y
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -52,7 +52,12 @@ mask_red = cv2.medianBlur(mask_red, 7)
 mask_blue = cv2.medianBlur(mask_blue, 7)
 mask_yellow = cv2.medianBlur(mask_yellow, 7)
 
-mask = cv2.bitwise_or(mask_green, mask_red, mask_blue, mask_yellow)  # 检测轮廓
+mask = cv2.bitwise_or(mask_green, mask_red)
+mask = cv2.bitwise_or(mask, mask_blue)
+mask = cv2.bitwise_or(mask, mask_yellow)
+
+cv2.imwrite('mask.png', mask)
+
 contours, hierarchy = cv2.findContours(mask_green, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 contours2, hierarchy2 = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 contours3, hierarchy3 = cv2.findContours(mask_blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -60,27 +65,23 @@ contours4, hierarchy4 = cv2.findContours(mask_yellow, cv2.RETR_EXTERNAL, cv2.CHA
 
 for cnt in contours:
     cv2.drawContours(frame, [cnt], 0, (255, 255, 255), 5)
-    shape = getShape(cnt)
-    (x, y, w, h) = cv2.boundingRect(cnt)
-    cv2.putText(frame, "Green " + shape, (x, y - 5), font, 0.7, (0, 255, 0), 2)
+    shape, x, y = getShape(cnt)
+    cv2.putText(frame, "Green " + shape, (x, y - 5), font, 0.7, (255, 0, 255), 2)
 
 for cnt2 in contours2:
     cv2.drawContours(frame, [cnt2], 0, (255, 255, 255), 5)
-    shape = getShape(cnt2)
-    (x2, y2, w2, h2) = cv2.boundingRect(cnt2)
-    cv2.putText(frame, "Red " + shape, (x2, y2 - 5), font, 0.7, (0, 0, 255), 2)
+    shape, x2, y2 = getShape(cnt2)
+    cv2.putText(frame, "Red " + shape, (x2, y2 - 5), font, 0.7, (255, 0, 255), 2)
 
 for cnt3 in contours3:
     cv2.drawContours(frame, [cnt3], 0, (255, 255, 255), 5)
-    shape = getShape(cnt3)
-    (x3, y3, w3, h3) = cv2.boundingRect(cnt3)
-    cv2.putText(frame, "Blue " + shape, (x3, y3 - 5), font, 0.7, (255, 0, 0), 2)
+    shape, x3, y3 = getShape(cnt3)
+    cv2.putText(frame, "Blue " + shape, (x3, y3 - 5), font, 0.7, (255, 0, 255), 2)
 
 for cnt4 in contours4:
     cv2.drawContours(frame, [cnt4], 0, (255, 255, 255), 5)
-    shape = getShape(cnt4)
-    (x4, y4, w4, h4) = cv2.boundingRect(cnt4)
-    cv2.putText(frame, "Yellow " + shape, (x4, y4 - 5), font, 0.7, (0, 255, 255), 2)
+    shape, x4, y4 = getShape(cnt4)
+    cv2.putText(frame, "Yellow " + shape, (x4, y4 - 5), font, 0.7, (255, 0, 255), 2)
 
 cv2.imshow("dection", frame)
 
